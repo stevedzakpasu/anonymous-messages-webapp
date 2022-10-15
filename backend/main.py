@@ -43,8 +43,12 @@ async def generate_token(form_data: _security.OAuth2PasswordRequestForm = _fasta
     return await _services.create_token(admin)
 
 
-@app.get("/api/view_messages/", response_model=List[_schemas.Message])
-def view_messages(skip: int = 0, limit: int = 10, db: _orm.Session = _fastapi.Depends(_services.get_current_user)):
+@app.get("/api/view_messages/", response_model=List[_schemas.Message], dependencies=[_fastapi.Depends(_services.get_current_user)])
+# If an endpoint depends something such as a current user then its advisable to use the 'dependencies' argument
+# to declare that dependency. There can be more than one dependencies hence why its a list.
+# The ORM session should depend on the database at all times and nothing but the database
+# hence the change to _fastapi.Depends(_servicesget_db)
+def view_messages(skip: int = 0, limit: int = 10, db: _orm.Session = _fastapi.Depends(_services.get_db)):
     messages = _services.get_messages(db=db, skip=skip, limit=limit)
     return messages
 
