@@ -1,9 +1,11 @@
 import React from "react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();
 
   const submitLogin = async () => {
     const requestOptions = {
@@ -21,9 +23,10 @@ function Login() {
     const data = await response.json();
 
     if (!response.ok) {
-      console.log("erroe");
+      alert("Invalid Login Details");
     } else {
-      console.log(data.access_token);
+      localStorage.setItem("access_token", data.access_token);
+      navigate("/messages");
     }
   };
 
@@ -74,7 +77,7 @@ function Login() {
               class="bg-gradient-to-b from-gray-700 to-gray-900 font-medium p-2 md:p-4 text-white uppercase w-full"
               onClick={handleSubmit}
             >
-              Login
+              LOGIN
             </button>
           </form>
         </div>

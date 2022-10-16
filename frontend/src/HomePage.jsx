@@ -20,15 +20,15 @@ function HomePage() {
       console.log(res);
     });
     setMessage("");
+    alert("Your message has been succesfully sent!");
   };
 
   const handleMessageChange = (event) => {
     setMessage(event.target.value);
-    console.log(event.target.value);
   };
   return (
     <div>
-      <div class="bg-white-100 h-screen overflow-hidden flex items-center justify-center">
+      <div class="bg-white-100 h-screen overflow-hidden flex items-center justify-center flex-col">
         <div class="flex justify-center">
           <div class="mb-3 xl:w-96">
             <label class="form-label inline-block mb-2 text-gray-700">
