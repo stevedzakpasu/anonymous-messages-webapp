@@ -1,3 +1,5 @@
+from starlette.middleware.cors import CORSMiddleware
+from starlette.middleware import Middleware
 from typing import List
 import fastapi as _fastapi
 import fastapi.security as _security
@@ -6,8 +8,8 @@ import services as _services
 import schemas as _schemas
 import uvicorn
 
-app = _fastapi.FastAPI()
 
+app = _fastapi.FastAPI()
 # _services.create_database()
 
 
@@ -19,7 +21,7 @@ async def create_message(
     return await _services.create_message(message=message, db=db)
 
 
-@app.post("/api/new_admin/")
+@app.post("/api/new_admin/", dependencies=[_fastapi.Depends(_services.get_current_user)])
 async def create_admin(
     admin: _schemas.AdminCreate, db: _orm.Session = _fastapi.Depends(_services.get_db)
 ):
@@ -53,11 +55,19 @@ def view_messages(skip: int = 0, limit: int = 10, db: _orm.Session = _fastapi.De
     return messages
 
 
-@app.get("/api/view_admin/", response_model=List[_schemas.Admin])
+@app.get("/api/view_admin/", response_model=List[_schemas.Admin], dependencies=[_fastapi.Depends(_services.get_current_user)])
 def view_admin(skip: int = 0, limit: int = 10, db: _orm.Session = _fastapi.Depends(_services.get_db)):
     admin = _services.get_admin(db=db, skip=skip, limit=limit)
     return admin
 
 
+origins = ["*"]
+app = CORSMiddleware(
+    app=app,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 if __name__ == "__main__":
     uvicorn.run(app, host="localhost", port=8002, log_level="debug")
